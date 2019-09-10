@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>shot</title>
+</head>
+
+<body>
+    <canvas id="ctx" style="display:none"></canvas>
+    <img id="cropimg" src="" alt="" style="display:none">
+
+    <img id="img" src="./shot.jpg" style="position: fixed;top:0px ; left:0px;width: 100%; height:100% ;  
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -webkit-filter: brightness(1.2);
+    filter: brightness(1.2);
+    -ms-user-select: none;" alt="screenshot" onmousedown="mousedown(event)" onmousemove="mousemove(event)"
+        onmouseup="(mouseup(event))">
+
+    <div id="selectbox"
+        style="position:absolute; top:10px;left:10px;width:0px;height:0px; background-color: rgba(0, 255, 255, 0.26)">
+
+    </div>
+
+
+    <div class="left"></div>
+    <div class="right"></div>
+    <div class="top"></div>
+    <div class="bottom"></div>
+    <div class="notebar">You are in OCR mode. click the OCR button to exit.</div>
+    <script src="./ocrad/ocrad.js/ocrad.js"></script>
+    <script>
+        var c = document.getElementById("ctx");
+        var ctx = c.getContext("2d");
+        const remote = require('electron').remote
+        const {
+            clipboard,
+            app
+        } = require('electron').remote
+
+
+        // document.getElementById("img").src = app.getAppPath()+ "/shot.jpg"
+        // console.log(app.getAppPath() + "/shot.jpg")
+        var beginx
+        var beginy
+        var ismousedown = false
+
+        function mousedown(event) {
+            ismousedown = true
+            beginx = event.clientX;
+            beginy = event.clientY;
+
+            var box = document.getElementById('selectbox')
+            box.style.width = "0px"
+            box.style.height = "0px"
+            box.style.top = beginy + "px"
+            box.style.left = beginx + "px"
+        }
+
+
+        function mousemove(event) {
+            if (ismousedown) {
+                var movex = event.clientX;
+                var movey = event.clientY;
+
+                var box = document.getElementById('selectbox')
+
+                box.style.width = movex - beginx + "px"
+                box.style.height = movey - beginy + "px"
+            }
+        }
+        var he
+        var wi
+        var text
+
+        function mouseup(event) {
+            var movex = event.clientX;
+            var movey = event.clientY;
+
+            var box = document.getElementById('selectbox')
+
+            box.style.width = movex - beginx + "px"
+            box.style.height = movey - beginy + "px"
+            ismousedown = false
+            wi = document.getElementById("img").naturalWidth / window.innerWidth * (movex - beginx)
+            he = document.getElementById("img").naturalHeight / window.innerHeight * (movey - beginy)
+            ctx.canvas.height = he
+            ctx.canvas.width = wi
+            ctx.fillRect(0, 0, wi, he)
+
+            ctx.drawImage(document.getElementById("img"), document.getElementById("img").naturalWidth / window
+                .innerWidth * beginx, document.getElementById("img").naturalHeight / window.innerHeight * beginy,
+                wi, he, 0, 0, wi, he)
+
+
+            document.getElementById("cropimg").src = c.toDataURL("image/png");
+
+
+            text = OCRAD(ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height));
+
+            console.log(text)
+
+            clipboard.writeText(text)
+        }
+    </script>
+
+    <style>
+        .notebar {
+            position: fixed;
+            left: calc(50% - 150px);
+            top: 30px;
+            width: 300px;
+            height: 20px;
+            background-color: #C4C4C4;
+            color: #1d1d1d;
+            border-radius: 20px;
+            font-size: 12px;
+            text-align: center;
+            border: 2px solid #343434;
+
+
+
+        }
+
+        .top{
+            position: absolute;
+            top:0px;
+            left:0px;
+            height:2px;
+            width: 100%;
+            background-color: red;
+
+        }
+        .bottom{
+            position: absolute;
+            bottom:0px;
+            left:0px;
+            height:2px;
+            width: 100%;
+            background-color: red;
+
+        }
+        .left{
+            position: absolute;
+            bottom:0px;
+            left:0px;
+            height:100%;
+            width: 2px;
+            background-color: red;
+
+        }
+        .right{
+            position: absolute;
+            bottom:0px;
+            right:0px;
+            height:100%;
+            width: 2px;
+            background-color: red;
+
+        }
+
+    </style>
+
+</body>
+
+</html>

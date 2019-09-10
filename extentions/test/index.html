@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>test</title>
+</head>
+
+<body>
+    test
+
+    <script>
+        const remote = require('electron').remote
+        const fs = remote.require('fs')
+        let win = remote.getCurrentWindow()
+        const {
+            clipboard,
+            BrowserWindow,
+            app
+        } = require('electron').remote
+
+
+     
+        var x = 10 
+        var y = 10
+        var xs = 1 
+        var ys =  1
+        win.setPosition(x,y)
+
+
+        setInterval(()=>{
+            x += xs
+            y += ys
+            if (y > 500 || y < 0){ys = - ys}
+            if (x > 700|| x < 0){xs = - xs}
+            win.setPosition(x,y)
+            
+        },1)
+        setInterval(startex("test"),1000)
+
+        function startex(data){
+console.log (data) 
+exwindow = new BrowserWindow({
+      width: 400,
+      height: 300,
+      minHeight: 300,
+      minWidth: 360,
+      frame: true,
+      webPreferences: {
+        nodeIntegration: true,
+      }
+    })
+    exwindow.loadFile("C:/Users/kveld/Documents/code/electron/SpeakOCR/extentions/test/index.html")
+    exwindow.setMenu(null);
+    console.log(__dirname+"/extentions/"+data+"/index.html")
+}
+
+    </script>
+</body>
+
+</html>
